@@ -321,40 +321,7 @@ $extra = [
     'nfo' => $nfo,
     'pt_gen' => $_POST['pt_gen'] ?? '',
 ];
-if (isset($_POST['hr'][$catmod]) && isset(\App\Models\Torrent::$hrStatus[$_POST['hr'][$catmod]]) && user_can('torrent_hr')) {
-    $insert['hr'] = $_POST['hr'][$catmod];
-}
-if(user_can('torrentsticky')) {
-    if (isset($_POST['pos_state']) && isset(\App\Models\Torrent::$posStates[$_POST['pos_state']])) {
-        $posStateUntil = $_POST['pos_state_until'] ?: null;
-        $posState = $_POST['pos_state'];
-        if ($posState == \App\Models\Torrent::POS_STATE_STICKY_NONE) {
-            $posStateUntil = null;
-        }
-        if ($posStateUntil && \Carbon\Carbon::parse($posStateUntil)->lte(now())) {
-            $posState = \App\Models\Torrent::POS_STATE_STICKY_NONE;
-            $posStateUntil = null;
-        }
-        $insert['pos_state'] = $posState;
-        $insert['pos_state_until'] = $posStateUntil;
-    }
-}
-if(user_can('torrentmanage') && ($CURUSER['picker'] == 'yes' || get_user_class() >= \App\Models\User::CLASS_SYSOP)) {
-    if (isset($_POST['picktype']) && isset(\App\Models\Torrent::$pickTypes[$_POST['picktype']])) {
-        $insert['picktype'] = $_POST['picktype'];
-        if ($insert['picktype'] == \App\Models\Torrent::PICK_NORMAL) {
-            $insert['picktime'] = null;
-        } else {
-            $insert['picktime'] = now()->toDateTimeString();
-        }
-    }
-}
-if (user_can('torrent-approval-allow-automatic')) {
-    $insert['approval_status'] = \App\Models\Torrent::APPROVAL_STATUS_ALLOW;
-}
-if (user_can('torrent-set-price') && $paidTorrentEnabled) {
-    $insert['price'] = $_POST['price'] ?? 0;
-}
+
 do_log("[INSERT_TORRENT]: " . nexus_json_encode($insert));
 $id = \Nexus\Database\NexusDB::insert('torrents', $insert);
 
