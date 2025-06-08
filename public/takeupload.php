@@ -217,64 +217,9 @@ else //upload to unknown section
 
 //$torrent = str_replace("_", " ", $torrent);
 
-if ($largesize_torrent && $totallen > ($largesize_torrent * 1073741824)) //Large Torrent Promotion
-{
-	switch($largepro_torrent)
-	{
-		case 2: //Free
-		{
-			$sp_state = 2;
-			break;
-		}
-		case 3: //2X
-		{
-			$sp_state = 3;
-			break;
-		}
-		case 4: //2X Free
-		{
-			$sp_state = 4;
-			break;
-		}
-		case 5: //Half Leech
-		{
-			$sp_state = 5;
-			break;
-		}
-		case 6: //2X Half Leech
-		{
-			$sp_state = 6;
-			break;
-		}
-		case 7: //30% Leech
-		{
-			$sp_state = 7;
-			break;
-		}
-		default: //normal
-		{
-			$sp_state = 1;
-			break;
-		}
-	}
-}
-else{ //ramdom torrent promotion
-	$sp_id = mt_rand(1,100);
-	if($sp_id <= ($probability = $randomtwoupfree_torrent)) //2X Free
-		$sp_state = 4;
-	elseif($sp_id <= ($probability += $randomtwoup_torrent)) //2X
-		$sp_state = 3;
-	elseif($sp_id <= ($probability += $randomfree_torrent)) //Free
-		$sp_state = 2;
-	elseif($sp_id <= ($probability += $randomhalfleech_torrent)) //Half Leech
-		$sp_state = 5;
-	elseif($sp_id <= ($probability += $randomtwouphalfdown_torrent)) //2X Half Leech
-		$sp_state = 6;
-	elseif($sp_id <= ($probability += $randomthirtypercentdown_torrent)) //30% Leech
-		$sp_state = 7;
-	else
-		$sp_state = 1; //normal
-}
+
+
+
 //
 //if ($altname_main == 'yes'){
 //$cnname_part = unesc(trim($_POST["cnname"]));
@@ -341,7 +286,7 @@ $insert = [
     'processing' => $processingid,
     'team' => $teamid,
     'save_as' => $dname,
-    'sp_state' => $sp_state,
+    'sp_state' => 2,
     'added' => $dateTimeStringNow,
     'last_action' => $dateTimeStringNow,
 //    'nfo' => $nfo,
