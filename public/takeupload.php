@@ -170,6 +170,20 @@ else {
     $type = "multi";
 }
 
+// --- START: 新增文件扩展名检查功能 ---
+$forbidden_extensions = ['bat', 'exe', 'rar', 'zip', 'vbs', 'cmd', 'com', 'scr', 'js', 'jse', 'wsf', 'wsh', 'ps1', 'sh', 'bin', 'dll', 'sys', 'msi', 'reg', 'inf', 'iso', 'img', 'dmg']; // 增加更多常见的危险扩展名
+
+foreach ($filelist as $file) {
+    $filename = $file[0]; // 获取文件名 (可能包含路径)
+    $extension = strtolower(pathinfo($filename, PATHINFO_EXTENSION)); // 获取并转换为小写的文件扩展名
+
+    if (in_array($extension, $forbidden_extensions)) {
+        bark("禁止上传包含以下文件类型的文件: ." . $extension . "。请移除文件 '" . htmlspecialchars($filename) . "' 后再尝试上传。");
+    }
+}
+// --- END: 新增文件扩展名检查功能 ---
+
+
 $dict['announce'] = get_protocol_prefix() . $announce_urls[0];  // change announce url to local
 $dict['info']['private'] = 1;
 //The following line requires uploader to re-download torrents after uploading
