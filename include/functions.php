@@ -2432,7 +2432,6 @@ function stdhead($title = "", $msgalert = true, $script = "", $place = "")
 	$title = $SITENAME." :: " . htmlspecialchars($title);
 	if ($titlekeywords_tweak)
 		$title .= " ".htmlspecialchars($titlekeywords_tweak);
-	$title .= " - Powered by ".PROJECTNAME;
 	if ($SITE_ONLINE == "no") {
 		if (get_user_class() < UC_ADMINISTRATOR) {
 			die($lang_functions['std_site_down_for_maintenance']);
