@@ -454,12 +454,17 @@ else // continue an existing session
 		}
 	}
 
+// 超速不计部分
 	do_log("upthis: $upthis, downthis: $downthis, announcetime: $announcetime, is_cheater: $is_cheater");
     $snatchInfo = get_snatch_info($torrentid, $userid);
 	if (!$is_cheater && ($trueupthis > 0 || $truedownthis > 0))
 	{
         $dataTraffic = getDataTraffic($torrent, $_GET, $az, $self, $snatchInfo, apply_filter('torrent_promotion', $torrent));
-        $USERUPDATESET[] = "uploaded = uploaded + " . $dataTraffic['uploaded_increment_for_user'];
+        if ($upthis > 0 && ($dataTraffic['uploaded_increment'] / $self['announcetime']) > 524888 && ($torrent['owner'] != $az['id'] && (strtotime('+3 days', strtotime($torrent['added'])) > time()))) {
+            $USERUPDATESET[] ="uploaded = uploaded + " . (524888 * $self['announcetime']);//1048576=每秒钟增加1MB
+        } else {
+            $USERUPDATESET[] = "uploaded = uploaded + " . $dataTraffic['uploaded_increment_for_user'];
+        }
         $USERUPDATESET[] = "downloaded = downloaded + " . $dataTraffic['downloaded_increment_for_user'];
 	}
 }
