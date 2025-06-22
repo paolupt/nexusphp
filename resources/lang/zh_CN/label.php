@@ -46,6 +46,9 @@ return [
     'created_at_end' => '创建时间结束',
     'text_quote' => '引用',
     'text_code' => "代码",
+    'language' => '语言',
+    'content' => '内容',
+    'is_default' => '是否默认',
     'setting' => [
         'nav_text' => '设置',
         'backup' => [

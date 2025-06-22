@@ -46,6 +46,8 @@ return [
         'oauth_provider' => 'Authorization provider',
         'queue_monitor' => 'Queue monitor',
         'user_modify_logs' => 'User modify logs',
+        'message_templates' => 'Message templates',
+        'tracker_url' => 'Tracker URL',
     ],
     'resources' => [
         'agent_allow' => [

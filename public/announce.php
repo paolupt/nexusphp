@@ -111,7 +111,7 @@ $seeder = ($left == 0) ? "yes" : "no";
 
 // check passkey
 if (!$az = $Cache->get_value('user_passkey_'.$passkey.'_content')){
-	$res = sql_query("SELECT id, username, downloadpos, enabled, uploaded, downloaded, class, parked, clientselect, showclienterror, passkey, donor, donoruntil, seedbonus FROM users WHERE passkey=". sqlesc($passkey)." LIMIT 1");
+	$res = sql_query("SELECT id, username, downloadpos, enabled, uploaded, downloaded, class, parked, clientselect, showclienterror, passkey, donor, donoruntil, seedbonus, tracker_url_id FROM users WHERE passkey=". sqlesc($passkey)." LIMIT 1");
 	$az = mysql_fetch_array($res);
 	do_log("[check passkey], currentUser: " . nexus_json_encode($az));
 	$Cache->cache_value('user_passkey_'.$passkey.'_content', $az, 3600);
@@ -133,6 +133,13 @@ $CURUSER = $GLOBALS["CURUSER"] = $az;
 $isDonor = is_donor($az);
 $az['__is_donor'] = $isDonor;
 $log = "user: $userid, isDonor: $isDonor, seeder: $seeder, ip: $ip, ipv4: $ipv4, ipv6: $ipv6";
+//check tracker url
+$trackerUrl = \App\Models\TrackerUrl::getById($az['tracker_url_id']);
+$currentUrl = getSchemeAndHttpHost();
+if (!str_contains($trackerUrl, $currentUrl)) {
+    do_log("announce check tracker url, trackerUrl: $trackerUrl does not contains: $currentUrl");
+    warn("you should announce to: $trackerUrl");
+}
 
 //3. CHECK IF CLIENT IS ALLOWED
 //$clicheck_res = check_client($peer_id,$agent,$client_familyid);
@@ -191,6 +198,13 @@ if ($torrent['approval_status'] != \App\Models\Torrent::APPROVAL_STATUS_ALLOW &&
     if (!user_can('seebanned', false, $az['id'])) {
         err("torrent review not approved");
     }
+}
+
+if ($left > $torrent['size']) {
+    //disable download
+    (new \App\Repositories\UserRepository())->updateDownloadPrivileges(null, $userid, 'no', 'fake_announce');
+    do_log(sprintf("fake announce, user: %s, torrent: %s, announce left: %s > size: %s", $userid, $torrentid, $left, $torrent['size']), 'warn');
+    warn("fake announce");
 }
 
 // select peers info from peers table for this torrent
@@ -347,6 +361,46 @@ $log .= ", [SEED_BOX], isSeedBoxRuleEnabled: $isSeedBoxRuleEnabled, isIPSeedBox:
 
 do_log($log);
 
+//handle paid torrent
+if (
+    $seeder == 'no'
+    && isset($az['seedbonus'])
+    && isset($torrent['price'])
+    && $torrent['price'] > 0
+    && $torrent['owner'] != $userid
+    && get_setting("torrent.paid_torrent_enabled") == "yes"
+) {
+    $torrentRep = new \App\Repositories\TorrentRepository();
+    $buyStatus = $torrentRep->getBuyStatus($userid, $torrentid);
+    do_log("user: $userid buy torrent: $torrentid, status: $buyStatus");
+    if ($buyStatus > 0) {
+        do_log(sprintf("user: %s buy torrent： %s fail count: %s", $userid, $torrentid, $buyStatus), "error");
+        if ($buyStatus > 3) {
+            //warn
+            \App\Utils\MsgAlert::getInstance()->add(
+                "announce_paid_torrent_too_many_times",
+                time() + 86400,
+                "announce to paid torrent and fail too many times, please make sure you have enough bonus!",
+                "",
+                "black"
+            );
+        }
+        if ($buyStatus > 10) {
+            //disable download
+            (new \App\Repositories\UserRepository())->updateDownloadPrivileges(null, $userid, 'no', 'announce_paid_torrent_too_many_times');
+        }
+        \Nexus\Nexus::dispatchQueueJob(new \App\Jobs\BuyTorrent($userid, $torrentid));
+        //already fail, add fail times
+        $torrentRep->addBuyFailCache($userid, $torrentid);
+        warn("purchase in progress, please try again later, and make sure you have enough bonus", 300);
+    }
+    if ($buyStatus == \App\Repositories\TorrentRepository::BUY_STATUS_UNKNOWN) {
+        //just enqueue job
+        \Nexus\Nexus::dispatchQueueJob(new \App\Jobs\BuyTorrent($userid, $torrentid));
+        warn("purchase started, please wait", 300);
+    }
+}
+
 // current peer_id, or you could say session with tracker not found in table peers
 if (!isset($self))
 {
@@ -393,42 +447,6 @@ if (!isset($self))
 			}
 		}
 	}
-    if (
-        $seeder == 'no'
-        && isset($az['seedbonus'])
-        && isset($torrent['price'])
-        && $torrent['price'] > 0
-        && $torrent['owner'] != $userid
-        && get_setting("torrent.paid_torrent_enabled") == "yes"
-    ) {
-        $torrentRep = new \App\Repositories\TorrentRepository();
-        $buyStatus = $torrentRep->getBuyStatus($userid, $torrentid);
-        if ($buyStatus > 0) {
-            do_log(sprintf("user: %v buy torrent： %v fail count: %v", $userid, $torrentid, $buyStatus), "error");
-            if ($buyStatus > 3) {
-                //warn
-                \App\Utils\MsgAlert::getInstance()->add(
-                    "announce_paid_torrent_too_many_times",
-                    time() + 86400,
-                    "announce to paid torrent and fail too many times, please make sure you have enough bonus!",
-                    "",
-                    "black"
-                );
-            }
-            if ($buyStatus > 10) {
-                //disable download
-                (new \App\Repositories\UserRepository())->updateDownloadPrivileges(null, $userid, 'no', 'announce_paid_torrent_too_many_times');
-            }
-            //already fail, add fail times
-            $torrentRep->addBuyFailCache($userid, $torrentid);
-            warn("purchase fail, please try again later, please make sure you have enough bonus", 300);
-        }
-        if ($buyStatus == \App\Repositories\TorrentRepository::BUY_STATUS_UNKNOWN) {
-            //just enqueue job
-            \App\Utils\ThirdPartyJob::addBuyTorrent($userid, $torrentid);
-            warn("purchase in progress, please wait", 300);
-        }
-    }
 }
 else // continue an existing session
 {
@@ -572,7 +590,11 @@ if (($left > 0 || $event == "completed") && $az['class'] < \App\Models\HitAndRun
                     $userid, $torrentid, $snatchInfo['id'], $nowStr, $nowStr, $nowStr
                 );
                 $affectedRows = sql_query($sql);
-                do_log("$hrLog, total downloaded: {$snatchInfo['downloaded']} >= required: $requiredDownloaded, [INSERT_H&R], sql: $sql, affectedRows: $affectedRows");
+                $hitAndRunId = mysql_insert_id();
+                do_log("$hrLog, total downloaded: {$snatchInfo['downloaded']} >= required: $requiredDownloaded, [INSERT_H&R], sql: $sql, affectedRows: $affectedRows, hitAndRunId: $hitAndRunId");
+                if ($hitAndRunId > 0) {
+                    sql_query("update snatched set hit_and_run_id = $hitAndRunId where id = {$snatchInfo['id']}");
+                }
             } else {
                 do_log("$hrLog, total downloaded: {$snatchInfo['downloaded']} < required: $requiredDownloaded", "debug");
             }
@@ -601,6 +623,7 @@ if (count($updateset) || $hasChangeSeederLeecher) // Update only when there is c
 if($client_familyid != 0 && $client_familyid != $az['clientselect']) {
     $USERUPDATESET[] = "clientselect = ".sqlesc($client_familyid);
 }
+$USERUPDATESET[] = "last_announce_at = $dt";
 /**
  * VIP do not calculate downloaded
  * @since 1.7.13

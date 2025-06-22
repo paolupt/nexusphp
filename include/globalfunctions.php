@@ -672,6 +672,7 @@ function command_exists($command): bool
 
 function get_tracker_schema_and_host($combine = false): array|string
 {
+    /*
     global $https_announce_urls, $announce_urls;
     $httpsAnnounceUrls = array_filter($https_announce_urls);
     $log = "cookie: " . json_encode($_COOKIE) . ", https_announce_urls: " . json_encode($httpsAnnounceUrls);
@@ -703,6 +704,16 @@ function get_tracker_schema_and_host($combine = false): array|string
     do_log($log);
     if ($combine) {
         return $ssl_torrent . $base_announce_url;
+    }
+    */
+    $url = \App\Models\TrackerUrl::getById(0);
+    if (empty($url)) {
+        return $combine ? "" : [];
+    }
+    $ssl_torrent = parse_url($url, PHP_URL_SCHEME) . "://" ;
+    $base_announce_url = parse_url($url, PHP_URL_HOST);
+    if ($combine) {
+        return $ssl_torrent .  $base_announce_url;
     }
     return compact('ssl_torrent', 'base_announce_url');
 }
@@ -1191,8 +1202,6 @@ function clear_agent_allow_deny_cache()
         \Nexus\Database\NexusDB::cache_del($denyCacheKey . $suffix);
     }
 }
-
-
 function user_can($permission, $fail = false, $uid = 0): bool
 {
     $log = "permission: $permission, fail: $fail, user: $uid";
@@ -1345,7 +1354,9 @@ function fire_event(string $name, \Illuminate\Database\Eloquent\Model $model, ?\
             $idKeyOld = $prefix . \Illuminate\Support\Str::random();
             \Nexus\Database\NexusDB::cache_put($idKeyOld, serialize($oldModel->toArray()), 3600*24*30);
         }
-        executeCommand("event:fire --name=$name --idKey=$idKey --idKeyOld=$idKeyOld", "string", true, false);
+//        executeCommand("event:fire --name=$name --idKey=$idKey --idKeyOld=$idKeyOld", "string", true, false);
+        \Nexus\Nexus::dispatchQueueJob(new \App\Jobs\FireEvent($name, $idKey, $idKeyOld));
+        do_log("success fire_event in nexus, name: $name, idKey: $idKey, idKeyOld: $idKeyOld");
     } else {
         $eventClass = \App\Enums\ModelEventEnum::$eventMaps[$name]['event'];
         if (str_ends_with($name, '_deleted')) {
@@ -1362,6 +1373,7 @@ function fire_event(string $name, \Illuminate\Database\Eloquent\Model $model, ?\
         }
         call_user_func_array([$eventClass, "dispatch"], $params);
         publish_model_event($name, $model->id);
+        do_log("success fire_event in laravel, name: $name, id: $model->id, oldId: " . ($oldModel ? $oldModel->id : ""));
     }
 }
 

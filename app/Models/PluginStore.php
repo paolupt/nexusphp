@@ -32,10 +32,16 @@ class PluginStore extends Model
     {
         $list = self::listAll(true);
         $enabled = Plugin::listEnabled();
-        foreach ($list as &$row) {
-            $row['installed_version'] = $enabled[$row['plugin_id']] ?? '';
+//        dd($list, $enabled);
+        foreach ($list as $key => $row) {
+            $list[$key]['installed_version'] = $enabled[$row['plugin_id']] ?? '';
         }
         return $list;
+    }
+
+    protected function sushiShouldCache()
+    {
+        return false;
     }
 
     public function getBlogPostUrl(): string
@@ -69,8 +75,13 @@ class PluginStore extends Model
 
     public function hasNewVersion(): bool
     {
-        return $this->installed_version
+        $result = $this->installed_version
             && version_compare($this->version, $this->installed_version, '>');
+        do_log(sprintf(
+            "%s, installed_version: %s, version: %s, hasNew: %s",
+            $this->plugin_id, $this->installed_version, $this->version, $result
+        ));
+        return $result;
     }
 
     public static function getInfo(string $id)
@@ -82,7 +93,7 @@ class PluginStore extends Model
     {
         $log = "listAll, withoutCache: $withoutCache";
         $cacheKey = "nexus_plugin_store_all";
-        $cacheTime = 86400*100;
+        $cacheTime = 86400;
         if (is_null(self::$rows)) {
             $log .= ", is_null";
             if ($withoutCache) {

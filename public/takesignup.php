@@ -171,7 +171,8 @@ if(mysql_num_rows($res_check_user) == 1)
 
 $ret = sql_query("INSERT INTO users (username, passhash, passkey, secret, auth_key, editsecret, email, country, gender, status, class, invites, ".($type == 'invite' ? "invited_by," : "")." added, last_access, lang, stylesheet".($showschool == 'yes' ? ", school" : "").", uploaded) VALUES (" . $wantusername . "," . $wantpasshash . "," . sqlesc($passkey) . "," . $secret . "," . $authKey. "," . $editsecret . "," . $email . "," . $country . "," . $gender . ", 'pending', ".$defaultclass_class.",". $invite_count .", ".($type == 'invite' ? "'$inviter'," : "") ." '". date("Y-m-d H:i:s") ."' , " . " '". date("Y-m-d H:i:s") ."' , ".$sitelangid . ",".$defcss.($showschool == 'yes' ? ",".$school : "").",".($iniupload_main > 0 ? $iniupload_main : 0).")") or sqlerr(__FILE__, __LINE__);
 $id = mysql_insert_id();
-fire_event("user_created", \App\Models\User::query()->find($id, \App\Models\User::$commonFields));
+$userInfo = \App\Models\User::query()->find($id, \App\Models\User::$commonFields);
+fire_event("user_created", $userInfo);
 $tmpInviteCount = get_setting('main.tmp_invite_count');
 if ($tmpInviteCount > 0) {
     $userRep = new \App\Repositories\UserRepository();
@@ -181,7 +182,10 @@ if ($tmpInviteCount > 0) {
 $dt = date("Y-m-d H:i:s");
 $subject = $lang_takesignup['msg_subject'].$SITENAME."!";
 $siteName = \App\Models\Setting::getSiteName();
-$msg = $lang_takesignup['msg_congratulations'].$wantusername.sprintf($lang_takesignup['msg_you_are_a_member'],$siteName, $siteName);
+$msg = \App\Models\MessageTemplate::forRegisterWelcome($userInfo->lang, ['username' => $userInfo->username]);
+if (empty($msg)) {
+    $msg = $lang_takesignup['msg_congratulations'].$wantusername.sprintf($lang_takesignup['msg_you_are_a_member'],$siteName, $siteName);
+}
 \App\Models\Message::add([
     'sender' => 0,
     'receiver' => $id,
@@ -229,7 +233,7 @@ if ($type == 'invite')
     $dt = date("Y-m-d H:i:s");
     $locale = get_user_locale($inviter);
     $subject = nexus_trans("user.msg_invited_user_has_registered", [], $locale);
-    $msg = nexus_trans("user.msg_user_you_invited", [],$locale).$usern.nexus_trans("user.msg_has_registered", [], $locale);
+    $msg = nexus_trans("user.msg_user_you_invited", [],$locale).$wantusername.nexus_trans("user.msg_has_registered", [], $locale);
     //sql_query("UPDATE users SET uploaded = uploaded + 10737418240 WHERE id = $inviter"); //add 10GB to invitor's uploading credit
     \App\Models\Message::add([
         'sender' => 0,
