@@ -171,7 +171,7 @@ else {
 }
 
 // --- START: 新增文件扩展名检查功能 ---
-$forbidden_extensions = ['bat', 'exe', 'rar', 'zip', 'vbs', 'cmd', 'com', 'scr', 'js', 'jse', 'wsf', 'wsh', 'ps1', 'sh', 'bin', 'dll', 'sys', 'msi', 'reg', 'inf', 'iso', 'img', 'dmg']; // 增加更多常见的危险扩展名
+$forbidden_extensions = ['bat', 'exe', 'vbs', 'cmd', 'com', 'scr', 'js', 'jse', 'wsf', 'wsh', 'ps1', 'sh', 'dll', 'sys', 'msi', 'reg']; // 增加更多常见的危险扩展名
 
 foreach ($filelist as $file) {
     $filename = $file[0]; // 获取文件名 (可能包含路径)
