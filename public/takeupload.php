@@ -397,7 +397,7 @@ if ($is_offer)
 	while($row = mysql_fetch_assoc($res))
 	{
         $locale = get_user_locale($row['userid']);
-		$pn_msg = nexus_trans("torrent.msg_offer_you_voted", [], $locale).$torrent.nexus_trans("torrent.msg_was_uploaded_by", [], $locale). $CURUSER["username"] .nexus_trans("torrent.msg_you_can_download", [], $locale) ."[url=" . get_protocol_prefix() . "$BASEURL/details.php?id=$id&hit=1]".nexus_trans("torrent.msg_here", [], $locale)."[/url]";
+		$pn_msg = nexus_trans("torrent.msg_offer_you_voted", [], $locale).$torrent.nexus_trans("torrent.msg_was_uploaded_by", [], $locale). $CURUSER["username"] .nexus_trans("torrent.msg_you_can_download", [], $locale) ."[url=" . get_protocol_prefix() . "$BASEURL/details.php?id=$id]".nexus_trans("torrent.msg_here", [], $locale)."[/url]";
 
 		//=== use this if you DO have subject in your PMs
 		$subject = nexus_trans("torrent.msg_offer", [], $locale).$torrent.nexus_trans("torrent.msg_was_just_uploaded", [], $locale);
