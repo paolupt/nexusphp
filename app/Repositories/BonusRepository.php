@@ -310,7 +310,7 @@ class BonusRepository extends BaseRepository
                 'msg' => nexus_trans("message.buy_torrent_success.body", [
                     'torrent_name' => $torrent->name,
                     'bonus' => $requireBonus,
-                    'url' => sprintf('details.php?id=%s&hit=1', $torrent->id)
+                    'url' => sprintf('details.php?id=%s', $torrent->id)
                 ], $buyerLocale),
             ];
             Message::add($buyTorrentSuccessMessage);

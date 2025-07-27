@@ -140,7 +140,7 @@ else {
                     while ($row = mysql_fetch_array($res)) {
                         $each = mysql_fetch_assoc(sql_query("SELECT * FROM torrents WHERE id = '" . $row["torrentid"] . "'"));
                         if (mysql_num_rows(sql_query("SELECT * FROM torrents WHERE id = '" . $row["torrentid"] . "'")) == 1)
-                            $ress .= (($arr['userid'] == $CURUSER['id'] || get_user_class() >= UC_UPLOADER) && $arr['finish'] == "no" ? "<input type=checkbox name=torrentid[] value=" . $each["id"] . ">" : "") . "<a href='details.php?id=" . $each["id"] . "&hit=1' >" . $each["name"] . "</a> " . ($arr['finish'] == "no" ? "" : "by " . get_username($each['owner'])) . "<br/>\n";
+                            $ress .= (($arr['userid'] == $CURUSER['id'] || get_user_class() >= UC_UPLOADER) && $arr['finish'] == "no" ? "<input type=checkbox name=torrentid[] value=" . $each["id"] . ">" : "") . "<a href='details.php?id=" . $each["id"] . "' >" . $each["name"] . "</a> " . ($arr['finish'] == "no" ? "" : "by " . get_username($each['owner'])) . "<br/>\n";
                     }
                     $ress .= "";
 

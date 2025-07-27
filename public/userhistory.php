@@ -224,8 +224,8 @@ if ($action == "viewcomments")
 
 		print("<p class=sub><table border=0 cellspacing=0 cellpadding=0><tr><td class=embedded>".
 		"$added&nbsp;---&nbsp;".$lang_userhistory['text_torrent'].
-		($torrent?("<a href=details.php?id=$torrentid&tocomm=1&hit=1>$torrent</a>"):" [Deleted] ").
-		"&nbsp;---&nbsp;".$lang_userhistory['text_comment']."</b>#<a href=details.php?id=$torrentid&tocomm=1&hit=1$page_url>$commentid</a>
+		($torrent?("<a href=details.php?id=$torrentid&tocomm=1>$torrent</a>"):" [Deleted] ").
+		"&nbsp;---&nbsp;".$lang_userhistory['text_comment']."</b>#<a href=details.php?id=$torrentid&tocomm=1$page_url>$commentid</a>
 	  </td></tr></table></p>\n");
 		print("<br />");
 

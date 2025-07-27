@@ -180,7 +180,7 @@ function maketable($res, $mode = 'seeding')
 		}
 		else $dissmall_descr == "";
 		$ret .= "<tr" .  $sphighlight  . "><td class=\"rowfollow nowrap\" valign=\"middle\" style='padding: 0px'>".return_category_image($arr['category'], "torrents.php?allsec=1&amp;")."</td>\n" .
-		"<td class=\"rowfollow\" width=\"100%\" align=\"left\"><a href=\"".htmlspecialchars("details.php?id=".$arr['torrent']."&hit=1")."\" title=\"".$nametitle."\"><b>" . $dispname . "</b></a>". $banned_torrent . $sp_torrent . $hrImg . $approvalStatusIcon .($dissmall_descr == "" ? "" : "<br />" . $dissmall_descr) . "</td>";
+		"<td class=\"rowfollow\" width=\"100%\" align=\"left\"><a href=\"".htmlspecialchars("details.php?id=".$arr['torrent'])."\" title=\"".$nametitle."\"><b>" . $dispname . "</b></a>". $banned_torrent . $sp_torrent . $hrImg . $approvalStatusIcon .($dissmall_descr == "" ? "" : "<br />" . $dissmall_descr) . "</td>";
 		$ret .= sprintf('<td class="rowfollow nowrap" align="center">%s<br/>%s</td>', substr($arr['added'], 0, 10), substr($arr['added'], 11));
 		//size
 		if ($showsize)
