@@ -210,7 +210,7 @@ if ($showlastxtorrents_main == "yes") {
 
 			while( $row = mysql_fetch_assoc($result) )
 			{
-				print ("<tr><a href=\"details.php?id=". $row['id'] ."&amp;hit=1\"><td><a href=\"details.php?id=". $row['id'] ."&amp;hit=1\"><b>" . htmlspecialchars($row['name']) . "</b><br/>" . htmlspecialchars($row['small_descr']) ."</td></a><td align=\"center\">" . $row['seeders'] . "</td><td align=\"center\">" . $row['leechers'] . "</td></tr>");
+				print ("<tr><a href=\"details.php?id=". $row['id'] ."\"><td><a href=\"details.php?id=". $row['id'] ."\"><b>" . htmlspecialchars($row['name']) . "</b><br/>" . htmlspecialchars($row['small_descr']) ."</td></a><td align=\"center\">" . $row['seeders'] . "</td><td align=\"center\">" . $row['leechers'] . "</td></tr>");
 			}
 			print ("</table>");
 		}
