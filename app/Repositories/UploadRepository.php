@@ -571,7 +571,7 @@ class UploadRepository extends BaseRepository
                     'category' => $categoryName,
                     'upload_by' => $this->handleAnonymous($torrentUploader->username, $torrentUploader, $user, $torrent),
                     'description' => Str::limit(strip_tags(format_comment($torrent->extra->descr)), 500),
-                    'torrent_url' => sprintf("%s/details.php?id=%s&hit=1", getBaseUrl(), $torrent->id),
+                    'torrent_url' => sprintf("%s/details.php?id=%s", getBaseUrl(), $torrent->id),
                 ], $locale);
                 $sendResult = $toolRep->sendMail($user->email, $subject, $body);
                 do_log(sprintf("%s, send result: %s", $logUser, $sendResult));
