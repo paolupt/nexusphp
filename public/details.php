@@ -447,7 +447,7 @@ WHERE " . $where_area . " ORDER BY torrents.id DESC") or sqlerr(__FILE__, __LINE
 					$sp_info = get_torrent_promotion_append($copy_row['sp_state'], '', false, '', 0, '', $copy_row['__ignore_global_sp_state'] ?? false);
 					$hrImg = get_hr_img($copy_row, $copy_row['search_box_id']);
 
-					$s .= "<tr". $sphighlight."><td class=\"rowfollow nowrap\" valign=\"middle\" style='padding: 0px'>".return_category_image($copy_row["catid"], "torrents.php?allsec=1&amp;")."</td><td class=\"rowfollow\" align=\"left\"><a href=\"" . htmlspecialchars(get_protocol_prefix() . $BASEURL . "/details.php?id=" . $copy_row["id"]. "&hit=1")."\">" . $dispname ."</a>". $sp_info. $hrImg ."</td>" .
+					$s .= "<tr". $sphighlight."><td class=\"rowfollow nowrap\" valign=\"middle\" style='padding: 0px'>".return_category_image($copy_row["catid"], "torrents.php?allsec=1&amp;")."</td><td class=\"rowfollow\" align=\"left\"><a href=\"" . htmlspecialchars(get_protocol_prefix() . $BASEURL . "/details.php?id=" . $copy_row["id"])."\">" . $dispname ."</a>". $sp_info. $hrImg ."</td>" .
 					"<td class=\"rowfollow\" align=\"left\">" .implode(', ', $taxonomyValues). "</td>" .
 					"<td class=\"rowfollow\" align=\"center\">" . mksize($copy_row["size"]) . "</td>" .
 					"<td class=\"rowfollow nowrap\" align=\"center\">" . str_replace("&nbsp;", "<br />", gettime($copy_row["added"],false)). "</td>" .

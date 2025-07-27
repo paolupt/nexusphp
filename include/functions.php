@@ -3608,7 +3608,7 @@ foreach ($rows as $row)
         $tdCover = sprintf('<td class="embedded" style="text-align: center;width: 46px;height: 46px"><img src="pic/misc/spinner.svg" data-src="%s" class="nexus-lazy-load" style="max-height: 46px;max-width: 46px" /></td>', $coverSrc);
     }
 
-	print("<td class=\"rowfollow\" width=\"100%\" align=\"left\" style='padding: 0px'><table class=\"torrentname\" width=\"100%\"><tr" . $sphighlight . ">$tdCover<td class=\"embedded\" style='padding-left: 5px'>".$stickyicon."<a $short_torrent_name_alt $mouseovertorrent href=\"details.php?id=".$id."&amp;hit=1\"><b>".htmlspecialchars($dispname)."</b></a>");
+	print("<td class=\"rowfollow\" width=\"100%\" align=\"left\" style='padding: 0px'><table class=\"torrentname\" width=\"100%\"><tr" . $sphighlight . ">$tdCover<td class=\"embedded\" style='padding-left: 5px'>".$stickyicon."<a $short_torrent_name_alt $mouseovertorrent href=\"details.php?id=".$id."\"><b>".htmlspecialchars($dispname)."</b></a>");
 	$picked_torrent = "";
 	if ($CURUSER['appendpicked'] != 'no'){
 	if($row['picktype']=="hot")
@@ -3723,7 +3723,7 @@ foreach ($rows as $row)
 			$hasnewcom = false;
 			$onmouseover = "";
 		}
-		print("<b><a href=\"details.php?id=".$id."&amp;hit=1&amp;cmtpage=1#startcomments\" ".$onmouseover.">". ($hasnewcom ? "<font class='new'>" : ""). $row["comments"] .($hasnewcom ? "</font>" : ""). "</a></b>");
+		print("<b><a href=\"details.php?id=".$id."&amp;cmtpage=1#startcomments\" ".$onmouseover.">". ($hasnewcom ? "<font class='new'>" : ""). $row["comments"] .($hasnewcom ? "</font>" : ""). "</a></b>");
 	}
 
 	print("</td>");
@@ -3739,14 +3739,14 @@ foreach ($rows as $row)
 	if ($row["seeders"]) {
 			$ratio = ($row["leechers"] ? ($row["seeders"] / $row["leechers"]) : 1);
 			$ratiocolor = get_slr_color($ratio);
-			print("<td class=\"rowfollow\" align=\"center\"><b><a href=\"details.php?id=".$id."&amp;hit=1&amp;dllist=1#seeders\">".($ratiocolor ? "<font color=\"" .
+			print("<td class=\"rowfollow\" align=\"center\"><b><a href=\"details.php?id=".$id."&amp;dllist=1#seeders\">".($ratiocolor ? "<font color=\"" .
 			$ratiocolor . "\">" . number_format($row["seeders"]) . "</font>" : number_format($row["seeders"]))."</a></b></td>\n");
 	}
 	else
 		print("<td class=\"rowfollow\"><span class=\"" . linkcolor($row["seeders"]) . "\">" . number_format($row["seeders"]) . "</span></td>\n");
 
 	if ($row["leechers"]) {
-		print("<td class=\"rowfollow\"><b><a href=\"details.php?id=".$id."&amp;hit=1&amp;dllist=1#leechers\">" .
+		print("<td class=\"rowfollow\"><b><a href=\"details.php?id=".$id."&amp;dllist=1#leechers\">" .
 		number_format($row["leechers"]) . "</a></b></td>\n");
 	}
 	else
@@ -5471,7 +5471,7 @@ function displayHotAndClassic()
 
                             $thumbnail = "<img width=\"{$width}\" height=\"{$height}\" src=\"".$photo_url."\" border=\"0\" alt=\"poster\" />";
 
-                            $thumbnail = "<a style=\"margin-right: 2px\" href=\"details.php?id=" . $array['id'] . "&amp;hit=1\" onmouseover=\"domTT_activate(this, event, 'content', '" . htmlspecialchars("<font class=\'big\'><b>" . (addslashes($array['name'] . $pro_torrent)) . "</b></font><br /><font class=\'medium\'>".(addslashes($array['small_descr'])) ."</font>"). "', 'trail', true, 'delay', 0,'lifetime',5000,'styleClass','niceTitle','maxWidth', 600);\">" . $thumbnail . "</a>";
+                            $thumbnail = "<a style=\"margin-right: 2px\" href=\"details.php?id=" . $array['id'] . "\" onmouseover=\"domTT_activate(this, event, 'content', '" . htmlspecialchars("<font class=\'big\'><b>" . (addslashes($array['name'] . $pro_torrent)) . "</b></font><br /><font class=\'medium\'>".(addslashes($array['small_descr'])) ."</font>"). "', 'trail', true, 'delay', 0,'lifetime',5000,'styleClass','niceTitle','maxWidth', 600);\">" . $thumbnail . "</a>";
                             $movies_list .= $thumbnail;
                             $count++;
                             if ($count >= 10)
